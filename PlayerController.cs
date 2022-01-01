@@ -75,21 +75,6 @@ public class PlayerController : MonoBehaviour
     private float initalYScale;
     private float crouching = 1;
 
-    /* [Header("Head Bob")]
-    [SerializeField] private bool useHeadBob;
-
-    [SerializeField] private float walkBobSpeed = 14f;
-    [SerializeField] private float walkBobAmount = 0.5f;
-    [Space]
-    [SerializeField] private float sprintBobSpeed = 18f;
-    [SerializeField] private float sprintBobAmount = 1f;
-    [Space]
-    [SerializeField] private float crouchBobSpeed = 8f;
-    [SerializeField] private float crouchBobAmount = 0.25f;
-
-    [System.NonSerialized] public float defaultYposition;
-    private float timer;*/
-
 
     private void Start()
     {
@@ -159,15 +144,12 @@ public class PlayerController : MonoBehaviour
                 {
                     crouching = crouchSpeedMultiplier;
                     transform.localScale = new Vector3(transform.localScale.x, initalYScale * crouchHeightMultiplier, transform.localScale.z);
-                    //remove for other projects
-                    transform.GetChild(0).transform.GetChild(0).localScale = new Vector3(0.8f , 1, 0.8f * (2 - crouchHeightMultiplier));
 
                 }
                 else
                 {
                     crouching = 1;
                     transform.localScale = new Vector3(transform.localScale.x, initalYScale, transform.localScale.z);
-                    transform.GetChild(0).transform.GetChild(0).localScale = new Vector3(0.8f, 1, 0.8f);
                 }
             }
         }
@@ -177,13 +159,11 @@ public class PlayerController : MonoBehaviour
             {
                 crouching = crouchSpeedMultiplier;
                 transform.localScale = new Vector3(transform.localScale.x, initalYScale * crouchHeightMultiplier, transform.localScale.z);
-                transform.GetChild(0).transform.GetChild(0).localScale = new Vector3(0.8f, 1, 0.8f * (2 - crouchHeightMultiplier));
             }
             else
             {
                 crouching = 1;
                 transform.localScale = new Vector3(transform.localScale.x, initalYScale, transform.localScale.z);
-                transform.GetChild(0).transform.GetChild(0).localScale = new Vector3(0.8f, 1, 0.8f);
             }
         }
         
