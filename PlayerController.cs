@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -72,8 +73,21 @@ public class PlayerController : MonoBehaviour
     public float crouchHeightMultiplier = 0.625f;
     [Range(0, 1)]
     public float crouchSpeedMultiplier = 0.625f;
-    private float initalYScale;
     private float crouching = 1;
+
+    [Header("Head Bob")]
+    [SerializeField] private bool useHeadBob;
+
+    [SerializeField] private float walkBobSpeed = 14f;
+    [SerializeField] private float walkBobAmount = 0.05f;
+    [Space]
+    [SerializeField] private float sprintBobSpeed = 18f;
+    [SerializeField] private float sprintBobAmount = 0.1f;
+    [Space]
+    [SerializeField] private float crouchBobSpeed = 8f;
+    [SerializeField] private float crouchBobAmount = 0.025f;
+
+    private float timer;
 
 
     private void Start()
@@ -81,8 +95,7 @@ public class PlayerController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         cam = Camera.main;
         movementCappedMaxSpeed = baseSpeed;
-        availableSprint = sprintDuration;
-        initalYScale = transform.localScale.y;
+        availableSprint = sprintDuration;   
     }
 
     void Update()
@@ -107,6 +120,10 @@ public class PlayerController : MonoBehaviour
         {
             Acceleration();
             Movement();
+            if (useHeadBob)
+            {
+                HeadBob();
+            }
         }
         if (!freezeGravity)
         {
@@ -114,9 +131,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HeadBob()
+    {
+        if (!grounded) return;
+
+        if (Mathf.Abs(horizontal) > 0.1f || Mathf.Abs(vertical) > 0.1f)
+        {
+            timer += Time.deltaTime * (crouching != 1 ? crouchBobSpeed : sprinting != 1 ? sprintBobSpeed : walkBobSpeed);
+            if (crouching == 1)
+            {
+                cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().initalCamYPos + Mathf.Sin(timer) * (crouching != 1 ? crouchBobAmount : sprinting != 1 ? sprintBobAmount : walkBobAmount), cam.transform.localPosition.z);
+            }
+            else
+            {
+                cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, (transform.GetComponent<PlayerCamera>().initalCamYPos * crouchHeightMultiplier) + Mathf.Sin(timer) * crouchBobAmount, cam.transform.localPosition.z);
+            }
+            
+        }
+    }
+
     private void Gravity()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, groundDetectionRange))
+        if (Input.GetKeyDown(KeyCode.Space) && doJump && grounded)
+        {
+            velocity = jumpStrength;
+        }
+        else if (Physics.Raycast(transform.position, Vector3.down, groundDetectionRange))
         {
             grounded = true;
             velocity = 0;
@@ -126,13 +166,9 @@ public class PlayerController : MonoBehaviour
             grounded = false;
             velocity += gravity * gravityScale * Time.deltaTime;
         }
-        if (Input.GetKeyDown(KeyCode.Space) && doJump && grounded)
-        {
-            velocity = jumpStrength;
-        }
+        
         characterController.Move(new Vector3(0, velocity, 0) * Time.deltaTime);
     }
-
 
     private void Movement()
     {
@@ -143,27 +179,25 @@ public class PlayerController : MonoBehaviour
                 if (crouching == 1)
                 {
                     crouching = crouchSpeedMultiplier;
-                    transform.localScale = new Vector3(transform.localScale.x, initalYScale * crouchHeightMultiplier, transform.localScale.z);
-
+                    cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().crouchCamYPos, cam.transform.localPosition.z);
                 }
                 else
                 {
                     crouching = 1;
-                    transform.localScale = new Vector3(transform.localScale.x, initalYScale, transform.localScale.z);
+                    cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().initalCamYPos, cam.transform.localPosition.z);
                 }
             }
         }
         else if (doCrouch)
         {
-            if (Input.GetKey(KeyCode.LeftControl))
-            {
-                crouching = crouchSpeedMultiplier;
-                transform.localScale = new Vector3(transform.localScale.x, initalYScale * crouchHeightMultiplier, transform.localScale.z);
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+            {                crouching = crouchSpeedMultiplier;
+                cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().crouchCamYPos, cam.transform.localPosition.z);
             }
-            else
+            else if (Input.GetKeyUp(KeyCode.LeftControl))
             {
                 crouching = 1;
-                transform.localScale = new Vector3(transform.localScale.x, initalYScale, transform.localScale.z);
+                cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().initalCamYPos, cam.transform.localPosition.z);
             }
         }
         
@@ -272,5 +306,3 @@ public class PlayerController : MonoBehaviour
     }
 
 }
-
-
