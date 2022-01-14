@@ -18,12 +18,16 @@ public class PlayerCamera : MonoBehaviour
     private float yRotation = 0.0f;
     
     private Camera cam;
+    public float initalCamYPos;
+    public float crouchCamYPos;
 
     void Start()
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
         cam = Camera.main;
+        initalCamYPos = cam.transform.localPosition.y;
+        crouchCamYPos = cam.transform.localPosition.y * transform.GetComponentInParent<PlayerController>().crouchHeightMultiplier;
     }
 
     void Update()
@@ -42,3 +46,4 @@ public class PlayerCamera : MonoBehaviour
         }
     }
 }
+
