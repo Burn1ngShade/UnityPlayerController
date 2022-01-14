@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     public float accelerationTime = 1.5f;
     [Range(0, 1)]
     public float startingAcceleration = 0.4f;
-    
+
     private float currentAcceleration;
 
     [Header("Jump")]
@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         cam = Camera.main;
         movementCappedMaxSpeed = baseSpeed;
-        availableSprint = sprintDuration;   
+        availableSprint = sprintDuration;
     }
 
     void Update()
@@ -146,7 +146,12 @@ public class PlayerController : MonoBehaviour
             {
                 cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, (transform.GetComponent<PlayerCamera>().initalCamYPos * crouchHeightMultiplier) + Mathf.Sin(timer) * crouchBobAmount, cam.transform.localPosition.z);
             }
-            
+
+        }
+        else
+        {
+            timer += Time.deltaTime * (crouching != 1 ? crouchBobSpeed : sprinting != 1 ? sprintBobSpeed : walkBobSpeed);
+            cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, crouching != 1 ? transform.GetComponent<PlayerCamera>().initalCamYPos * crouchHeightMultiplier : transform.GetComponent<PlayerCamera>().initalCamYPos, cam.transform.localPosition.z);
         }
     }
 
@@ -166,7 +171,7 @@ public class PlayerController : MonoBehaviour
             grounded = false;
             velocity += gravity * gravityScale * Time.deltaTime;
         }
-        
+
         characterController.Move(new Vector3(0, velocity, 0) * Time.deltaTime);
     }
 
@@ -191,7 +196,8 @@ public class PlayerController : MonoBehaviour
         else if (doCrouch)
         {
             if (Input.GetKeyDown(KeyCode.LeftControl))
-            {                crouching = crouchSpeedMultiplier;
+            {
+                crouching = crouchSpeedMultiplier;
                 cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().crouchCamYPos, cam.transform.localPosition.z);
             }
             else if (Input.GetKeyUp(KeyCode.LeftControl))
@@ -200,7 +206,7 @@ public class PlayerController : MonoBehaviour
                 cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, transform.GetComponent<PlayerCamera>().initalCamYPos, cam.transform.localPosition.z);
             }
         }
-        
+
         if (doSprint)
         {
             if (Input.GetKey(KeyCode.LeftShift) && availableSprint > 0 && crouching != 1 && !SprintWhileCrouching)
@@ -218,7 +224,7 @@ public class PlayerController : MonoBehaviour
                 SprintRegen();
             }
         }
-        
+
 
         //ajust max speed
         if (targetMovementCappedMaxSpeed > movementCappedMaxSpeed)
@@ -238,7 +244,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        
+
 
         //target max speed
         if (vertical != 0 && horizontal != 0)
