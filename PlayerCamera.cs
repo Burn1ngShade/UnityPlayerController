@@ -18,8 +18,8 @@ public class PlayerCamera : MonoBehaviour
     private float yRotation = 0.0f;
     
     private Camera cam;
-    public float initalCamYPos;
-    public float crouchCamYPos;
+    [System.NonSerialized]public float initalCamYPos;
+    [System.NonSerialized]public float crouchCamYPos;
 
     void Start()
     {
